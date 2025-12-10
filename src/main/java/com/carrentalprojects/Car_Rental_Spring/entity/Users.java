@@ -1,7 +1,13 @@
 package com.carrentalprojects.Car_Rental_Spring.entity;
 
+import java.util.Collection;
+import java.util.List;
+
 import com.carrentalprojects.Car_Rental_Spring.enums.UserRole;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
@@ -15,9 +21,9 @@ import lombok.Data;
 @Entity
 @Data
 @Table(name="users")
-public class Users {
-@Id
-@GeneratedValue(strategy = GenerationType.IDENTITY)
+public class Users implements UserDetails{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String email;
@@ -25,4 +31,38 @@ public class Users {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(userRole.name()));
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

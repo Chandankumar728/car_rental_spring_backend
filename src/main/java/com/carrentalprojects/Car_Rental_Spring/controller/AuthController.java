@@ -20,6 +20,10 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> registerCustomer(@RequestBody SignUpRequest signUpRequest) {
 
+        if(authService.hasCustomerWithEmail(signUpRequest.getEmail())) {
+            return new ResponseEntity<>("Email already exists", HttpStatus.BAD_REQUEST);
+        }
+
         UserDto createdCustomerDto = authService.createCustomer(signUpRequest);
 
         if (createdCustomerDto == null) {

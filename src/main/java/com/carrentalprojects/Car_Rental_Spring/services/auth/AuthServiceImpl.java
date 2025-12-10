@@ -1,7 +1,9 @@
 package com.carrentalprojects.Car_Rental_Spring.services.auth;
 
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import jakarta.annotation.PostConstruct;
 
 import com.carrentalprojects.Car_Rental_Spring.dto.SignUpRequest;
 import com.carrentalprojects.Car_Rental_Spring.dto.UserDto;
@@ -16,6 +18,20 @@ import lombok.RequiredArgsConstructor;
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
+
+    @PostConstruct
+    public void createAdminAccount(){
+       Users adminAccount = userRepository.findFirstByUserRole(UserRole.ADMIN);
+       if(adminAccount == null){
+        Users newAdmin = new Users();
+        newAdmin.setName("Admin");
+        newAdmin.setEmail("admin@test.com");
+        newAdmin.setPassword(new BCryptPasswordEncoder().encode("admin"));
+        newAdmin.setUserRole(UserRole.ADMIN);
+        userRepository.save(newAdmin);
+        System.out.println("Admin account created successfully");
+       }
+    }
 
     @Override
     public UserDto createCustomer(SignUpRequest signUpRequest){

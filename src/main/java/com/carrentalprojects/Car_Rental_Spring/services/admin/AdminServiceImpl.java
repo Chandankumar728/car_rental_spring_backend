@@ -1,5 +1,8 @@
 package com.carrentalprojects.Car_Rental_Spring.services.admin;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,6 +77,34 @@ public class AdminServiceImpl implements AdminService {
             e.printStackTrace();
             System.err.println("=====================================");
             return false;
+        }
+    }
+
+
+     @Override
+    public List<CarDto> getAllCars() {
+        try {
+            List<Car> cars = carRepository.findAll();
+            System.out.println("Found " + cars.size() + " cars in database");
+            
+            // return cars.stream().map(this::mapCarToDto).collect(Collectors.toList());
+            return cars.stream().map(car -> {
+                CarDto carDto = new CarDto();
+                carDto.setId(car.getId());
+                carDto.setBrand(car.getBrand());
+                carDto.setType(car.getType());
+                carDto.setModalYear(car.getModalYear());
+                carDto.setPrice(car.getPrice());
+                carDto.setDescription(car.getDescription());
+                carDto.setColor(car.getColor());
+                carDto.setTransmission(car.getTransmission());
+                carDto.setReturnImage(car.getImage());
+                return carDto;
+            }).collect(Collectors.toList());
+        } catch (Exception e) {
+            System.err.println("Error in getAllCars: " + e.getMessage());
+            e.printStackTrace();
+            return List.of(); // Return empty list on error
         }
     }
 }

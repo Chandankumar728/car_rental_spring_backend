@@ -1,6 +1,7 @@
 package com.carrentalprojects.Car_Rental_Spring.services.admin;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -105,6 +106,97 @@ public class AdminServiceImpl implements AdminService {
             System.err.println("Error in getAllCars: " + e.getMessage());
             e.printStackTrace();
             return List.of(); // Return empty list on error
+        }
+    }
+
+    //get car by id
+    @Override
+    public CarDto getCarById (Long id) {
+        try {
+            Optional<Car> carOptional = carRepository.findById(id);
+            
+            if (carOptional.isPresent()) {
+                System.out.println("Car found with ID: " + id);
+                Car car = carOptional.get();
+                CarDto carDto = new CarDto();
+                carDto.setId(car.getId());
+                carDto.setBrand(car.getBrand());
+                carDto.setType(car.getType());
+                carDto.setModalYear(car.getModalYear());
+                carDto.setPrice(car.getPrice());
+                carDto.setDescription(car.getDescription());
+                carDto.setColor(car.getColor());
+                carDto.setTransmission(car.getTransmission());
+                carDto.setReturnImage(car.getImage());
+                return carDto;
+            } else {
+                System.out.println("Car not found with ID: " + id);
+                return null;
+            }
+        } catch (Exception e) {
+            System.err.println("Error in getCarById: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    @Transactional
+    public boolean deleteCar(Long id) {
+        try {
+            Optional<Car> carOptional = carRepository.findById(id);
+            
+            if (carOptional.isPresent()) {
+                carRepository.deleteById(id);
+                System.out.println("✓ Car deleted successfully with ID: " + id);
+                return true;
+            } else {
+                System.out.println("✗ Car not found with ID: " + id);
+                return false;
+            }
+        } catch (Exception e) {
+            System.err.println("Error in deleteCar: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    @Transactional
+    public boolean updateCar(Long id, CarDto carDto) {
+        try {
+            Optional<Car> carOptional = carRepository.findById(id);
+            
+            if (carOptional.isPresent()) {
+                Car existingCar = carOptional.get();
+                
+                // Update fields
+                existingCar.setBrand(carDto.getBrand());
+                existingCar.setType(carDto.getType());
+                existingCar.setModalYear(carDto.getModalYear());
+                existingCar.setPrice(carDto.getPrice());
+                existingCar.setDescription(carDto.getDescription());
+                existingCar.setColor(carDto.getColor());
+                existingCar.setTransmission(carDto.getTransmission());
+                
+                // Update image only if new image is provided
+                if (carDto.getImage() != null && !carDto.getImage().isEmpty()) {
+                    byte[] imageBytes = carDto.getImage().getBytes();
+                    existingCar.setImage(imageBytes);
+                    System.out.println("Image updated: " + imageBytes.length + " bytes");
+                }
+                
+                carRepository.save(existingCar);
+                System.out.println("✓ Car updated successfully with ID: " + id);
+                return true;
+            } else {
+                System.out.println("✗ Car not found with ID: " + id);
+                return false;
+            }
+        } catch (Exception e) {
+            System.err.println("Error in updateCar: " + e.getMessage());
+            e.printStackTrace();
+            return false;
         }
     }
 }

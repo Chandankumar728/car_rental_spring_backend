@@ -6,9 +6,10 @@ import com.carrentalprojects.Car_Rental_Spring.dto.CarDto;
 
 public interface AdminService {
 
-    boolean postCar (CarDto carDto);
-    
-     List<CarDto> getAllCars();
-    
+    boolean postCar(CarDto carDto);
 
+    List<CarDto> getAllCars();
+    CarDto getCarById(Long id);
+    boolean updateCar(Long id, CarDto carDto);
+    boolean deleteCar(Long id);
 }
